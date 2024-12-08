@@ -71,7 +71,7 @@ function Home() {
       src="https://img.daisyui.com/images/stock/photo-1550258987-190a2d41a8ba.webp"
       className="rounded-box" />
   </div>
-  <div className="carousel-item">
+  <div className="carousel-item"> 
     <img
       src="https://img.daisyui.com/images/stock/photo-1559181567-c3190ca9959b.webp"
       className="rounded-box" />

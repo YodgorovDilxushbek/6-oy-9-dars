@@ -23,11 +23,14 @@ function MainLayout({ children }) {
           </div>
         </div>
         <div className="navbar-center">
-        <li><Link className="hover:bg-black py-3 px-4 rounded-md" to="/">Home</Link></li>
-            <li><Link className="hover:bg-black py-3 px-4 rounded-md" to="/about">About</Link></li>
-            <li><Link className="hover:bg-black py-3 px-4 rounded-md" to="/products">Products</Link></li>
-            <li><Link className="hover:bg-black py-3 px-4 rounded-md" to="/cart">Cart</Link></li>
-        </div>
+  <ul className="flex space-x-4">
+    <li><Link className="hover:bg-black py-3 px-4 rounded-md" to="/">Home</Link></li>
+    <li><Link className="hover:bg-black py-3 px-4 rounded-md" to="/about">About</Link></li>
+    <li><Link className="hover:bg-black py-3 px-4 rounded-md" to="/products">Products</Link></li>
+    <li><Link className="hover:bg-black py-3 px-4 rounded-md" to="/cart">Cart</Link></li>
+  </ul>
+</div>
+
         <div className="navbar-end">
           <button className="btn btn-ghost" onClick={toggleTheme}>
             {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
