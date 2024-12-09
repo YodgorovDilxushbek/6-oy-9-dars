@@ -1,85 +1,105 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import http from "../axios";
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { Puff } from 'react-loader-spinner'
+import { useNavigate } from 'react-router-dom'
 
 function Details() {
-  const [product, setProduct] = useState({});
-  const { id } = useParams(); 
-  const navigate = useNavigate();
-
-
-
-  
+  const [product, setProduct] = useState({})
+  const [loading, setLoading] = useState(false)
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [productColor, setProductColor] = useState('')
+  const [amount, setAmount] = useState(1)
 
   useEffect(() => {
-    if (!id) {
-      console.log("Product ID is missing");
-      return;
-    }
-
-    http
-      .get(`products/${id}`)
-      .then((response) => {
+    setLoading(true)
+    axios.get(`https://strapi-store-server.onrender.com/api/products/${id}`)
+      .then(response => {
         if (response.status === 200) {
-          setProduct(response.data.data);
+          setProduct(response.data.data)
+          if (response.data.data.attributes.colors && response.data.data.attributes.colors.length > 0) {
+            setProductColor(response.data.data.attributes.colors[0])
+          }
         }
       })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [id]); 
+      .catch(err => {
+        console.log(err)
+      })
+      .finally(() => setLoading(false))
+  }, [id])
+
+  function handleToHomePage() {
+    navigate('/')
+  }
+
+  function handleToProductsPage() {
+    navigate('/products')
+  }
+
+  function handleAddToCart(event) {
+    event.preventDefault()
+    const cartProduct = {
+      cartID: product.id + productColor,
+      productID: product.id,
+      image: product.attributes.image,
+      title: product.attributes.title,
+      price: product.attributes.price,
+      company: product.attributes.company,
+      productColor: productColor,
+      amount,
+    }
+
+    let existingCart = JSON.parse(localStorage.getItem('cart')) || []
+    existingCart.push(cartProduct)
+    localStorage.setItem('cart', JSON.stringify(existingCart))
+  }
 
   return (
-    <div>
-      <button onClick={() => { navigate("/"); }} className="btn btn-outline btn-primary w-32">Exit</button>
-      <div className="max-w-7xl mx-auto p-8 mt-10">
-        {product.id && product.attributes && (
-          <div className="flex flex-col lg:flex-row gap-12">
-            <div className="flex-1">
-              <img
-                src={product.attributes.image}
-                alt={product.attributes.title}
-                className="w-full h-full rounded-lg object-cover shadow-lg"
-              />
+    <>
+      {loading ? (
+        <div className='w-full pt-[200px] max-h-[500px] h-full flex justify-center items-center'>
+          <Puff visible={true} height="80" width="80" color="#fff" ariaLabel="puff-loading" wrapperStyle={{}} wrapperclassName="" />
+        </div>
+      ) : (
+        product.id && (
+          <div className='max-w-[1100px] w-full mx-auto py-24 h-full'>
+            <div className='flex items-center gap-2 text-[#F8F8F2] pb-[25px]'>
+              <button className='hover:underline' onClick={handleToHomePage}>Home</button>
+              <span className='text-[#bebebe] font-medium'>{'>'}</span>
+              <button className='hover:underline' onClick={handleToProductsPage}>Products</button>
             </div>
-            <div className="flex-1 space-y-6">
-              <h1 className="text-3xl font-bold text-gray-300">{product.attributes.title}</h1>
-              <h2 className="text-xl text-gray-500">{product.attributes.company}</h2>
-              <h2 className="text-2xl text-gray-400">${product.attributes.price}</h2>
-              <p className="text-gray-400">{product.attributes.description}</p>
-              <div>
-                <h4 className="text-lg font-semibold text-gray-500 mb-2">Colors</h4>
-                <div className="flex gap-2">
-                  {product.attributes.colors &&
-                    product.attributes.colors.map((color) => (
-                      <span
-                        key={color}
-                        style={{ backgroundColor: color }}
-                        className="w-8 h-8 rounded-full border border-gray-300 cursor-pointer"
-                      ></span>
-                    ))}
+            <div className='flex gap-14 justify-between text-[#F8F8F2]'>
+              <img src={product.attributes.image} className='max-w-[500px] h-96 object-cover rounded-lg lg:w-full' alt={product.attributes.title} />
+              <div className='flex flex-col max-w-[500px]'>
+                <h3 className='capitalize text-3xl text-gray-400 font-bold'>{product.attributes.title}</h3>
+                <h4 className='text-xl text-gray-400 text-neutral-content font-bold mt-2'>{product.attributes.company}</h4>
+                <p className='mt-3  text-gray-400 text-xl'>${product.attributes.price}</p>
+                <p className='mt-6 text-gray-400 leading-8'>{product.attributes.description}</p>
+                <h4 className='text-md font-medium tracking-wider text-gray-400 capitalize mt-6'>Colors</h4>
+                <div className='mt-2'>
+                  {
+                    product.attributes.colors && product.attributes.colors.map((color, index) => (<button key={index} type='button' className={`badge w-6 h-6 mr-2 ${color === productColor && 'border-2 border-secondary'}`} style={{ backgroundColor: color }} onClick={() => setProductColor(color)}></button>))
+                  }
                 </div>
+                <div className="flex flex-col max-w-[300px]">
+                  <label htmlFor="amountSelect" className="text-gray-400 font-semibold mt-2 mb-2">Amount</label>
+                  <select onChange={(e) => { setAmount(parseInt(e.target.value)) }} id="amountSelect" name="amount" className="bg-gray-800 text-white border-2 border-[#BF95F9] rounded-md px-4 py-3 text-[15px] focus:outline-none cursor-pointer focus:ring-1 focus:[#BF95F9]">
+                    {[...Array(20).keys()].map(i => (
+                      <option key={i} value={i + 1}>{i + 1}</option>
+                    ))}
+                  </select>
+                </div>
+                <button onClick={handleAddToCart} className='uppercase text-[15px] px-2 py-3 bg-[#BF95F9] hover:opacity-75 transition-[0.3s] active:scale-95 max-w-[120px] rounded-lg mt-[40px] text-[#272935] font-medium'>
+                  add to bag
+                </button>
               </div>
-              <div>
-                <h4 className="text-lg font-semibold text-gray-700 mb-2">Amount</h4>
-                <select
-                  className="w-40 py-3 px-2 border border-gray-300 rounded-lg bg-white text-black"
-                  defaultValue="1"
-                >
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
-                </select>
-              </div>
-              <button className="btn btn-primary w-40">ADD TO BAG</button>
             </div>
           </div>
-        )}
-      </div>
-    </div>
-  );
+        )
+      )}
+    </>
+  )
 }
 
-export default Details;
+export default Details
