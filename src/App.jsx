@@ -1,24 +1,31 @@
-import React from 'react';
-import { Route, Routes } from 'react-router-dom';
-import Home from './pages/Home.jsx';
-import MainLayout from './layout/MainLayout.jsx';
-import Details from './pages/Details.jsx';
-import Cart from './pages/Cart.jsx'; 
-import Products from './pages/Product.jsx';
-import Abaut from './pages/Abaut.jsx';
-
+import React from 'react'
+import { Route, Routes, Link } from 'react-router-dom'
+import Home from './pages/Home'
+import Product from './pages/Product'
+import Details from './pages/Details'
+import Cart from './pages/Cart'
+import ErrorPage from './pages/ErrorPage'
+import Header from './components/Header'
 function App() {
   return (
     <div>
+      <header>
+        <Header>
+          <Link to='/'></Link>
+          <Link to='/Product'></Link>
+          <Link to='/Cart'></Link>
+          <Link to='*'></Link>
+        </Header>
+      </header>
       <Routes>
-        <Route index element={<MainLayout><Home /></MainLayout>} />
-        <Route path='/Abaut' element={<MainLayout><Abaut /></MainLayout>} />
-        <Route path='/Cart' element={<MainLayout><Cart /></MainLayout>} />
-        <Route path='/products/:id' element={<MainLayout><Details /></MainLayout>} />
-        <Route path='/products' element={<MainLayout><Products /></MainLayout>} />
+        <Route path='/' element = {<Home></Home>}></Route>
+        <Route path='/Product' element = {<Product></Product>}></Route>
+        <Route path='/Details/:id' element = {<Details></Details>}></Route>
+        <Route path='/Cart' element = {<Cart></Cart>}></Route>
+        <Route path='*' element = {<ErrorPage></ErrorPage>}></Route>
       </Routes>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
